@@ -10,6 +10,7 @@
         pts::AbstractArray
     )
     (;f,dist,A,b,exact) = data
+    e       = 0.0
     vp      = v(pts)
     ∇vp     = Enzyme.gradient(Enzyme.Reverse, v, pts)[1]
     vxp,vyp = ∇vp[1:1, :], ∇vp[2:2, :]
@@ -19,11 +20,13 @@
     φ₂yp    = Enzyme.gradient(Enzyme.Reverse, φ₂, pts)[1][2:2, :]
     dp,dxp,dyp = dist(pts)
     fp      = f(pts)
-    Up      = exact(pts)
     uxp = @. dp*vxp + dxp*vp
     uyp = @. dp*vyp + dyp*vp
-    ℓ =  mean(abs2,@. A[1,1]*uxp+A[1,2]*uyp-φ₁p) + mean(abs2,@. A[2,1]*uxp+A[2,2]*uyp-φ₂p) + mean(abs2,@. φ₁xp + φ₂yp + b*dp*vp - fp) 
-    e =  mean(abs2,@. dp*vp - Up)
+    ℓ =  mean(abs2,@. A[1,1]*uxp+A[1,2]*uyp-φ₁p) + mean(abs2,@. A[2,1]*uxp+A[2,2]*uyp-φ₂p) + mean(abs2,@. -φ₁xp - φ₂yp + b*dp*vp - fp)
+    if !isnothing(exact)
+        Up      = exact(pts)
+        e =  mean(abs2,@. dp*vp - Up)
+    end
     return ℓ,e
 end
 

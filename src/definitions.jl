@@ -75,13 +75,13 @@ end
 #     b::B
 # end
 
-struct ProblemData{G<:Function,F<:Function,D<:Distance,T<:AbstractMatrix,B<:AbstractFloat,E<:Function}
+struct ProblemData{G<:Function,F<:Function,D<:Distance,T<:AbstractMatrix,B<:AbstractFloat,E<:Union{Nothing,Function}}
     gendata::G
     f::F
     dist::D
     A::T
     b::B
-    exact::Union{E,Nothing}
+    exact::E
 end
 
 #Un constructor para que se asigne A=I y b = [0,0] si no son especificados. 
