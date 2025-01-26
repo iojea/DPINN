@@ -28,7 +28,7 @@ A = Float32.([1 2;0 1])
 b = -2Π^2
 # DATO
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant.
-f(x) = - Π^2*cos.(Π*x[1:1,:]).*cos.(Π*x[2:2,:])
+f(x) = -2Π^2*cos.(Π*x[1:1,:]).*cos.(Π*x[2:2,:])
 
 # SOLUCIÓN EXACTA
 U(x) = sin.(Π*x[1:1,:]).*sin.(Π*x[2:2,:])
