@@ -20,7 +20,7 @@ include("training.jl")
 
 # exports
 
-export SolNN, Distance, ProblemData
+export Distance, ProblemData, @crear_clase
 export train_model
 
 end # module DPINN

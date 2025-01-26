@@ -2,6 +2,7 @@ using CairoMakie, DPINN, Lux
 
 ### Resolvemos el problema -Δu = -4 con condiciones de borde Dirichlet homogéneas en el disco unitario. Definimos paso a paso todos los elementos para hacer uso de nuestro módulo general.
 
+
 # # DEFINICIÓN DEL PROBLEMA
 # SAMPLEO de puntos (acá entra el dominio)
 function circ_point() 
@@ -25,9 +26,8 @@ end
 #  2. evitar el indexado con escalares (por eso el slicing: x[1:1,:]), que da un error al operar sobre xdev.
 # Con estos elementos creamos un objeto de tipo Distance. 
 d(x)  = one(eltype(x)) .- sum(x.^2,dims=1)
-dx(x) = -2x[1:1,:]
-dy(x) = -2x[2:2,:]
-dist = Distance(d,dx,dy)
+∇d(x) = -2x
+dist = Distance(d,∇d)
 
 # DATO
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant. 
@@ -37,18 +37,22 @@ f(x) = 4.0f0*one.(x[1:1,:])
 U(x) = one(eltype(x)) .- sum(x.^2,dims=1)
 
 # PROBLEMA
-problem_data = ProblemData(gen_data!,f,dist,U)
+problem_data = ProblemData(2,gen_data!,f,dist,U)
 # alternativa sin solución exacta (no computa errores)
 #problem_data = ProblemData(gen_data!,f,dist)
 
 
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
-structure = (;activation=σ,hidden=15,depth=5)
+structure = (;N=2,activation=σ,hidden=15,depth=5)
+
+# # Definimos una estructura acorde a la dimensión del problema y creamos un modelo. 
+@crear_clase SolDisco 2
+model = SolDisco(structure)
 
 # Entrenamos el modelo:
 n_points = 1000
-trained_model,losses,errors = train_model(n_points,structure,problem_data)
+trained_model,losses,errors = train_model(model,n_points,problem_data)
 
 # recuperamos la componente v.
 trained_v = Lux.testmode(
@@ -65,17 +69,17 @@ fig = Figure()
 ax11 = PolarAxis(fig[1, 1], title = "Solución")
 rs = 0:0.05f0:1
 Θ = range(0.0f0, 2Float32(pi), 67)
-cs = [U([r*cos(θ),r*sin(θ)])[1] for θ in Θ, r in rs]
-p1 = surface!(ax11, 0..2pi, 0..1, zeros(size(cs)), color = cs, shading = NoShading, colormap = :coolwarm)
+cs = [u([r*cos(θ),r*sin(θ)]) for θ in Θ, r in rs]
+plot1 = surface!(ax11, 0..2pi, 0..1, zeros(size(cs)), color = cs, shading = NoShading, colormap = :coolwarm)
 #ax.gridz[] = 100
 tightlimits!(ax11) # surface plots include padding by default
 hidedecorations!(ax11)
 hidespines!(ax11)
-Colorbar(fig[1,2], p1, flipaxis = false)
+Colorbar(fig[1,2], plot1, flipaxis = false)
 ax21 = PolarAxis(fig[2,1],title = "Exacta")
-ce = [u([r*cos(θ),r*sin(θ)]) for θ in Θ, r in rs]
-p2 = surface!(ax21, 0..2pi, 0..1, zeros(size(cs)), color = ce, shading = NoShading, colormap = :coolwarm)
-Colorbar(fig[2,2], p2, flipaxis = false)
+ce = [U([r*cos(θ),r*sin(θ)])[1] for θ in Θ, r in rs]
+plot2 = surface!(ax21, 0..2pi, 0..1, zeros(size(cs)), color = ce, shading = NoShading, colormap = :coolwarm)
+Colorbar(fig[2,2], plot2, flipaxis = false)
 tightlimits!(ax21) # surface plots include padding by default
 hidedecorations!(ax21)
 hidespines!(ax21)
