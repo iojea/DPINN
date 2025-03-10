@@ -329,9 +329,9 @@ version = "1.6.0"
 
 [[deps.Enzyme]]
 deps = ["CEnum", "EnzymeCore", "Enzyme_jll", "GPUCompiler", "LLVM", "Libdl", "LinearAlgebra", "ObjectFile", "PrecompileTools", "Preferences", "Printf", "Random", "SparseArrays"]
-git-tree-sha1 = "f39747b06eb299ca32c237d8423f092a8391e60f"
+git-tree-sha1 = "ffb85f06ef520821318ee22473674c2379a33296"
 uuid = "7da242da-08ed-463a-9acd-ee780be4f1d9"
-version = "0.13.28"
+version = "0.13.29"
 
     [deps.Enzyme.extensions]
     EnzymeBFloat16sExt = "BFloat16s"
@@ -472,9 +472,9 @@ weakdeps = ["Dates", "Test"]
     InverseFunctionsTestExt = "Test"
 
 [[deps.IrrationalConstants]]
-git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
+git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
-version = "0.2.2"
+version = "0.2.4"
 
 [[deps.IteratorInterfaceExtensions]]
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
@@ -522,6 +522,13 @@ deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
 git-tree-sha1 = "4b5ad6a4ffa91a00050a964492bc4f86bb48cea0"
 uuid = "dad2f222-ce93-54a1-a47d-0025e8a3acab"
 version = "0.0.35+0"
+
+
+[[deps.LLVMOpenMP_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "78211fb6cbc872f77cad3fc0b6cf647d923f4929"
+uuid = "1d63c593-3942-5779-bab2-d838dc0a180e"
+version = "18.1.7+0"
 
 [[deps.LayoutPointers]]
 deps = ["ArrayInterface", "LinearAlgebra", "ManualMemory", "SIMDTypes", "Static", "StaticArrayInterface"]
@@ -741,9 +748,9 @@ version = "0.4.17"
 
 [[deps.MLUtils]]
 deps = ["ChainRulesCore", "Compat", "DataAPI", "DelimitedFiles", "FLoops", "NNlib", "Random", "ShowCases", "SimpleTraits", "Statistics", "StatsBase", "Tables", "Transducers"]
-git-tree-sha1 = "7940c0af802586b97009f254aa6065000a16fa1d"
+git-tree-sha1 = "85a881db183988899fb41b1b7e5cd92bae7b3538"
 uuid = "f1d291b0-491e-4a28-83b9-f70985020b54"
-version = "0.4.5"
+version = "0.4.6"
 
 [[deps.MacroTools]]
 git-tree-sha1 = "72aebe0b5051e5143a079a4685a46da330a40472"
@@ -809,9 +816,10 @@ version = "0.9.27"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
-git-tree-sha1 = "fe891aea7ccd23897520db7f16931212454e277e"
+git-tree-sha1 = "cc0a5deefdb12ab3a096f00a6d42133af4560d71"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-version = "1.1.1"
+version = "1.1.2"
+
 
 [[deps.NameResolution]]
 deps = ["PrettyPrint"]
@@ -857,9 +865,9 @@ weakdeps = ["Adapt", "EnzymeCore"]
     OptimisersEnzymeCoreExt = "EnzymeCore"
 
 [[deps.OrderedCollections]]
-git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
+git-tree-sha1 = "cc4054e898b852042d7b503313f7ad03de99c3dd"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.7.0"
+version = "1.8.0"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -917,15 +925,16 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 version = "1.11.0"
 
 [[deps.Reactant]]
-deps = ["Adapt", "CEnum", "Downloads", "Enzyme", "EnzymeCore", "Functors", "GPUArraysCore", "Libdl", "LinearAlgebra", "OrderedCollections", "PrecompileTools", "Preferences", "Random", "ReactantCore", "Reactant_jll", "Scratch", "Sockets"]
-git-tree-sha1 = "1a0655c26c0f090cf1e3ce175483069ec09d2731"
+deps = ["Adapt", "CEnum", "Downloads", "Enzyme", "EnzymeCore", "Functors", "GPUArraysCore", "LLVMOpenMP_jll", "Libdl", "LinearAlgebra", "OrderedCollections", "PrecompileTools", "Preferences", "Random", "ReactantCore", "Reactant_jll", "Scratch", "Sockets"]
+git-tree-sha1 = "c1a73e33cc1567fcd50c815bb5a39be8860fa7a7"
 uuid = "3c362404-f566-11ee-1572-e11a4b42c853"
-version = "0.2.22"
+version = "0.2.25"
 
     [deps.Reactant.extensions]
     ReactantAbstractFFTsExt = "AbstractFFTs"
     ReactantArrayInterfaceExt = "ArrayInterface"
-    ReactantCUDAExt = "CUDA"
+    ReactantCUDAExt = ["CUDA", "KernelAbstractions"]
+    ReactantKernelAbstractionsExt = "KernelAbstractions"
     ReactantNNlibExt = "NNlib"
     ReactantOffsetArraysExt = "OffsetArrays"
     ReactantPythonCallExt = "PythonCall"
@@ -938,6 +947,7 @@ version = "0.2.22"
     AbstractFFTs = "621f4979-c628-5d54-868e-fcf4e3e8185c"
     ArrayInterface = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
     CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
     NNlib = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
     OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
     PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
@@ -954,9 +964,10 @@ version = "0.1.4"
 
 [[deps.Reactant_jll]]
 deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
-git-tree-sha1 = "b00356ddada912b234cf09486436e012e51f3de6"
+git-tree-sha1 = "1ef99cc63c004885f1d9f4f3ddb40392abfada7e"
 uuid = "0192cb87-2b54-54ad-80e0-3be72ad8a3c0"
-version = "0.0.52+0"
+version = "0.0.60+0"
+
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"

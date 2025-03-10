@@ -7,18 +7,26 @@
         data::ProblemData,
         pts::AbstractArray
     )
-    (;f,dist,A,b,exact) = data
+
+    (;f,dist,bd,A,b,exact) = data
+    (;dD,dN) = dist
+    (;gD,gN,η) = bd
     v       = first(fixednets)
-    φs      = fixednets[2:end]
-    vp      = v(pts)
-    ∇vp     = Enzyme.gradient(Reverse, v, pts)[1]
-    φp      = vcat([φ(pts) for φ in φs]...)
-    divφp     = sum(Enzyme.gradient(Reverse,φ,pts)[1][i:i,:] for (i,φ) in enumerate(φs))
-    dp,∇dp = dist(pts)
+    ψs      = fixednets[2:end]
+    # Functions
+    u = isnothing(gD) ? x->dD(x).*v(x) : x-> gD(x) .+ dD(x).*v(x)
+    φs = Tuple(isnothing(dN) ? x-> ψ(x) : x-> ψ(x) + (gN(x) - ψ(x).*η(x)[i:i,:])./(one(eltype(x)) .+ dN(x)) .* η(x)[i:i,:] for (i,ψ) in enumerate(ψs))
+    φp = reduce(vcat,φ(pts) for φ in φs)
+    #vp      = v(pts)
+    #∇vp     = Enzyme.gradient(Reverse, v, pts)[1]
+    # ψp      = vcat([ψ(pts) for ψ in ψs]...)
+    #    φp      = isnothing(dN) ? ψp : ψp + (gN(pts) - sum(ψp.*η(pts),dims=1)./(one(eltype(pts)) .+ dN(pts))) .* η(pts)
+    divφp   = sum(Enzyme.gradient(Reverse,φ,pts)[1][i:i,:] for (i,φ) in enumerate(φs))
+    #dDp,∇dDp  = dD(pts),∇dD(pts)
     fp      = f(pts)
-    ∇up     = @. vp*∇dp  + dp*∇vp
-    up      = dp.*vp
-    ℓ = mean(abs2,sum(A*∇up-φp,dims=1)) + mean(abs2,-divφp + b*up - fp)
+    ∇up     = Enzyme.gradient(Reverse,u,pts)[1] # @. vp*∇dDp  + dDp*∇vp
+    up      =  u(pts) #isnothing(gD) ? dDp.*vp : gD(pts) + dDp.*vp
+    ℓ = mean(sum(abs2,A*∇up-φp,dims=1)) + mean(abs2,-divφp + b*up - fp)
     e =  isnothing(exact) ? 0.0f0 : mean(abs2,up - exact(pts)) 
     return ℓ,e
 end
@@ -44,7 +52,9 @@ function train_model(nets::M,n_points,data; seed=0, bs::Int=n_points÷10, maxite
     #nets = create_nets(dim,structure)
     rng = Xoshiro(0)
     Random.seed!(rng,seed)
-     
+
+
+        
     ps, st = Lux.setup(rng, nets) |> xdev 
     train_state = Training.TrainState(nets, ps, st, Adam(0.05f0))
     step(i) =  0.05f0 / 2^(i÷1000)

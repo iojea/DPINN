@@ -27,31 +27,41 @@ end
 # Con estos elementos creamos un objeto de tipo Distance. 
 d(x)  = one(eltype(x)) .- sum(x.^2,dims=1)
 ∇d(x) = -2x
-dist = Distance(d,∇d)
+dist = Distance(d,nothing)
 
 # DATO
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant. 
 f(x) = 4.0f0*one.(x[1:1,:]) 
 
+#BoundaryData
+bd = BoundaryData(nothing,nothing,nothing)
+
 # SOLUCIÓN EXACTA
 U(x) = one(eltype(x)) .- sum(x.^2,dims=1)
 
 # PROBLEMA
-problem_data = ProblemData(2,gen_data!,f,dist,U)
+
+problem_data = ProblemData(2,gen_data!,f,dist,bd,U)
+
 # alternativa sin solución exacta (no computa errores)
 #problem_data = ProblemData(gen_data!,f,dist)
 
 
+
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
-structure = (;N=2,activation=σ,hidden=15,depth=5)
+
+structure = (;N=2,activation=sigmoid_fast,hidden=15,depth=5)
+
 
 # # Definimos una estructura acorde a la dimensión del problema y creamos un modelo. 
 @crear_clase SolDisco 2
 model = SolDisco(structure)
 
 # Entrenamos el modelo:
-n_points = 1000
+
+n_points = 2000
+
 trained_model,losses,errors = train_model(model,n_points,problem_data)
 
 # recuperamos la componente v.

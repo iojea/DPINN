@@ -21,7 +21,9 @@ d(x)  = (x[1:1,:] .- x[1:1,:].^2).*(x[2:2,:] .- x[2:2,:].^2)
 ∇d(x) = [(one(eltype(x)) .- 2x[1:1,:]).*(x[2:2,:] .- x[2:2,:].^2);
          (one(eltype(x)) .- 2x[2:2,:]).*(x[1:1,:] .- x[1:1,:].^2)]
 
-dist = Distance(d,∇d)
+
+dist = Distance(d,nothing)
+
 
 # multiplos:
 const Π = Float32(π)
@@ -32,23 +34,26 @@ b = -2Π^2
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant.
 f(x) = -2Π^2*cos.(Π*x[1:1,:]).*cos.(Π*x[2:2,:])
 
+#Boundary Data
+bd = BoundaryData(nothing,nothing,nothing)
 # SOLUCIÓN EXACTA
 U(x) = sin.(Π*x[1:1,:]).*sin.(Π*x[2:2,:])
 
 # PROBLEMA
-problem_data = ProblemData(2,gen_data!,f,dist,A,b,U)
-# alternativa sin solución exacta (no computa errores)
-#problem_data = ProblemData(gen_data!,f,dist)
+
+problem_data = ProblemData(2,gen_data!,f,dist,bd,A,b,U)
+
 
 
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
-structure = (;N=2,activation=σ,hidden=15,depth=5)
+structure = (;N=2,activation=sigmoid_fast,hidden=15,depth=5)
+
 @crear_clase SolCuadrado 2
 model = SolCuadrado(structure)
 
 # Entrenamos el modelo:
-n_points = 2000
+n_points = 2500
 trained_model,losses,errors = train_model(model,n_points,problem_data;maxiters=10000)
 
 # recuperamos la componente v.
