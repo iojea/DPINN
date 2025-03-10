@@ -122,7 +122,7 @@ end
 #Un constructor para que se asigne A=I y b = 0 si no son especificados. 
 function ProblemData(dim,gendata!,f,d::Distance,bd::BoundaryData)
     A = Matrix{Float32}(I(dim)) |> xdev
-    return ProblemData(dim,gendata!,f,d,A,0.0f0,nothing)
+    return ProblemData(dim,gendata!,f,d,bd,A,0.0f0,nothing)
 end 
 
 function ProblemData(dim,gendata!,f,d::Distance,bd::BoundaryData,exact::E) where {E<:Function}
