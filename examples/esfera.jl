@@ -30,7 +30,9 @@ end
 # Con estos elementos creamos un objeto de tipo Distance. 
 d(x)  = one(eltype(x)) .- sum(x.^2,dims=1)
 ∇d(x) = -2x
+
 dist = Distance(d,nothing)
+
 
 # DATO
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant.
@@ -47,24 +49,30 @@ end
 # SOLUCIÓN EXACTA
 U(x) = sin.(Π*sum(x.^2,dims=1))
 
+
 #BoudaryData
 bd = BoundaryData(nothing,nothing,nothing)
 # PROBLEMA
 problem_data = ProblemData(3,gen_data!,f,dist,bd,A,b,U)
+
 # alternativa sin solución exacta (no computa errores)
 #problem_data = ProblemData(gen_data!,f,dist)
 
 
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
+
 structure = (;N=3,activation=fast_sigmoid,hidden=15,depth=5)
+
 
 # # Definimos una estructura acorde a la dimensión del problema y creamos un modelo. 
 @crear_clase SolEsfera 3
 model = SolEsfera(structure)
 
 # Entrenamos el modelo:
+
 n_points = 40000
+
 trained_model,losses,errors = train_model(model,n_points,problem_data)
 
 # recuperamos la componente v.

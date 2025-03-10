@@ -7,6 +7,7 @@
         data::ProblemData,
         pts::AbstractArray
     )
+
     (;f,dist,bd,A,b,exact) = data
     (;dD,dN) = dist
     (;gD,gN,η) = bd

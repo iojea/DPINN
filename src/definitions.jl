@@ -29,6 +29,7 @@ function create_nets(structure::NamedTuple)
     create_nets(N,activation,hidden,depth)
 end
 
+
 #### CLASE N-DIMENSIONAL ###
 # # Esto es un poco rebuscado, pero fue el único camino con el que logré que funcione.
 # Para que Enzyme.gradient nos funcione bien necesitamos redes de Rⁿ->R. Pero si tenemos un problema en Rⁿ, entonces necesitamos n+1 funciones (v y todas las derivadas parciales). Y eso lo tenemos que empaquetar en un tipo de dato que sea subtipo de `Lux.AbstractLuxContainerLayer`. Esto no es sencillo, porque uno no puede (de manera natural) crear estructuras con un número indefinido de campos. Para lograr esto, implementé el macro `@crear_clase` que nos permite definir una estructura nueva, dándode un nombre e indicando la dimensión del problema a tratar. Esto elimina la vieja clase SolNN.
@@ -74,6 +75,7 @@ end
     Distance(d,∇d)
 Crea una variable de tipo `Distance` que almacena una función distancia y su gradiente. Notar que `∇d` debe ser un campo vectorial: para un vector `x`, debe ocurrir `length(∇d(x))==length(x)`.
 """
+
 struct Distance{D,N<:Union{Nothing,Function}}
     dD::D
     dN::N
@@ -93,6 +95,7 @@ struct BoundaryData{D<:Union{Nothing,Function},N<:Union{Nothing,Function},nN<:Un
 end
 
 
+
 # Definimos una estructura para almacenar la información general del problema 
 # struct ProblemData{F<:Function,G<:Function,D::Distance,M<:AbstractMatrix,B<:AbstractFloat}
 #     gendata::F
@@ -101,6 +104,7 @@ end
 #     A::M
 #     b::B
 # end
+
 
 struct ProblemData{I<:Integer,G<:Function,F<:Function,D<:Distance,BD<:BoundaryData,T<:AbstractMatrix,B<:AbstractFloat,E<:Union{Nothing,Function}}
     dim::I
@@ -120,10 +124,12 @@ struct ProblemData{I<:Integer,G<:Function,F<:Function,D<:Distance,BD<:BoundaryDa
 end
 
 #Un constructor para que se asigne A=I y b = 0 si no son especificados. 
+
 function ProblemData(dim,gendata!,f,d::Distance,bd::BoundaryData)
     A = Matrix{Float32}(I(dim)) |> xdev
     return ProblemData(dim,gendata!,f,d,A,0.0f0,nothing)
 end 
+
 
 function ProblemData(dim,gendata!,f,d::Distance,bd::BoundaryData,exact::E) where {E<:Function}
     A = Matrix{Float32}(I(dim))|>xdev

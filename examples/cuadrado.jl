@@ -21,7 +21,9 @@ d(x)  = (x[1:1,:] .- x[1:1,:].^2).*(x[2:2,:] .- x[2:2,:].^2)
 ∇d(x) = [(one(eltype(x)) .- 2x[1:1,:]).*(x[2:2,:] .- x[2:2,:].^2);
          (one(eltype(x)) .- 2x[2:2,:]).*(x[1:1,:] .- x[1:1,:].^2)]
 
+
 dist = Distance(d,nothing)
+
 
 # multiplos:
 const Π = Float32(π)
@@ -38,14 +40,15 @@ bd = BoundaryData(nothing,nothing,nothing)
 U(x) = sin.(Π*x[1:1,:]).*sin.(Π*x[2:2,:])
 
 # PROBLEMA
+
 problem_data = ProblemData(2,gen_data!,f,dist,bd,A,b,U)
-# alternativa sin solución exacta (no computa errores)
-#problem_data = ProblemData(gen_data!,f,dist)
+
 
 
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
 structure = (;N=2,activation=sigmoid_fast,hidden=15,depth=5)
+
 @crear_clase SolCuadrado 2
 model = SolCuadrado(structure)
 
