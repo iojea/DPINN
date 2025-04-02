@@ -8,7 +8,7 @@ build_u(v,dD,::Nothing) = x->dD(x).*v(x)
 function build_φs(ψs,dN,gN,η)
     [x->ψ(x).+η(x)[i:i,:].*(gN(x).+sum(ψk(x).*η(x)[k:k,:] for (k,ψk) in enumerate(ψs))./(one(eltype(x)).+dN(x))) for (i,ψ) in enumerate(ψs)]
 end
-build_φs(ψs,::Nothing,::Nothing,::Nothing) = [x-> ψ(x) .+ 1.0f0 for ψ in ψs]
+build_φs(ψs,::Nothing,::Nothing,::Nothing) = ψs
 
 mdot(a,b) = sum(a.*b,dims=1)
 function build_divφp(ψs,dN,gN,η,pts)
