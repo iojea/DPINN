@@ -17,42 +17,43 @@ end
 #  1. garantizar estabilidad de tipos (Lux suele trabajar por defecto con Float32, mientras que Julia en general usa Float64, es importante evitar mezclarlos para evitar un deterioro de la performance)
 #  2. evitar el indexado con escalares (por eso el slicing: x[1:1,:]), que da un error al operar sobre xdev.
 # Con estos elementos creamos un objeto de tipo Distance. 
-d(x)  = (x[1:1,:] .- x[1:1,:].^2).*(x[2:2,:] .- x[2:2,:].^2)
-
-
-dist = Distance(d,nothing)
-
+dD(x)  = x[1:1,:] .*(x[2:2,:] .- x[2:2,:].^2)
+dN(x)  = 1.0f0 .- x[1:1,:]
+dist = Distance(dD,dN)
 
 # multiplos:
 const Π = Float32(π)
-A = Float32.([1 2;0 1])
-b = -2Π^2
+A = Float32.([1 -0.5;-0.5 1])
+b = 0.0f0
 
 # DATO
 # De nuevo, la sintaxis está para estabilidad de tipos y manejo de arrays de Reactant.
-f(x) = -2Π^2*cos.(Π*x[1:1,:]).*cos.(Π*x[2:2,:])
+f(x) = Π*cos.(Π*x[2:2,:]) + Π^2*x[1:1,:].*sin.(Π*x[2:2,:])
 
 #Boundary Data
-bd = BoundaryData(nothing,nothing,nothing)
+gD(x) = zero.(x[1:1,:])
+η(x) = reduce(vcat,(one.(x[1:1,:]),zero.(x[2:2,:])))
+gN(x) = sin.(Π*x[2:2,:])
+bd = BoundaryData(gD,gN,η)
 # SOLUCIÓN EXACTA
-U(x) = sin.(Π*x[1:1,:]).*sin.(Π*x[2:2,:])
+U(x) = x[1:1,:].*sin.(Π*x[2:2,:])
 
 # PROBLEMA
-
 problem_data = ProblemData(2,gen_data!,f,dist,bd,A,b,U)
-
+# alternativa sin solución exacta (no computa errores)
+#problem_data = ProblemData(gen_data!,f,dist)
 
 
 # # ENTRENAMIENTO DE LA RED
 # Estructura de la red:
-structure = (;N=2,activation=sigmoid_fast,hidden=15,depth=5)
-
+structure = (;N=2,activation=sigmoid_fast,hidden=12,depth=4)
 @crear_clase SolCuadrado 2
 model = SolCuadrado(structure)
 
 # Entrenamos el modelo:
-n_points = 2500
-trained_model,losses,errors = train_model(model,n_points,problem_data;maxiters=10000)
+n_points = 10000
+
+trained_model,losses,errors = train_model(model,n_points,problem_data;bs=n_points÷2, maxiters=10000)
 
 # recuperamos la componente v.
 trained_v = Lux.testmode(
@@ -60,7 +61,7 @@ trained_v = Lux.testmode(
 )
 
 # Construimos la solución u a partir de v y d:
-u(x) = d(x)[1]*trained_v(x)[1]
+u(x) = gD(x)[1] + dD(x)[1]*trained_v(x)[1]
 
 # # GRAFICOS
 # Graficamos en una misma figura 6 cosas: la solución aproximada y la exacta en una especie de heatmap, con su correspondiente Colorbar, y a la derecha la evolución de la loss y del error respecto de la solución exacta.
