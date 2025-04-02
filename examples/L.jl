@@ -95,7 +95,8 @@ hidedecorations!(ax11)
 hidespines!(ax11)
 Colorbar(fig[1,2], p1, flipaxis = false)
 ax21 = Axis(fig[2,1],title = "Exacta")
-ce = [U([xxx,yyy])[1] for xxx in xx, yyy in yy]
+ũ(x) = all(x.>0.5f0) ? 0.0f0 : U(x)
+ce = [ũ([xxx,yyy])[1] for xxx in xx, yyy in yy]
 p2 = surface!(ax21, 0..1, 0..1, zeros(size(cs)), color = ce, shading = NoShading, colormap = :coolwarm)
 Colorbar(fig[2,2], p2, flipaxis = false)
 tightlimits!(ax21) # surface plots include padding by default
