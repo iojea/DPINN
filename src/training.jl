@@ -40,7 +40,6 @@ grad(f,y) = Enzyme.gradient(Enzyme.Reverse,f,y)[1]
         data::ProblemData,
         pts::AbstractArray
     )
-    D = length(fixednets)-1
     (;f,dist,bd,A,b,exact) = data
     (;dD,dN) = dist
     (;gD,gN,η) = bd
